@@ -1,15 +1,22 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const morgan = require("morgan");
+
+// Config port
+const PORT = process.env.PORT || 5000;
+
+// Route Files
+const bootCampsRoutes = require("./routes/bootCamps");
 
 // Load env vars
 dotenv.config({ path: "./config/config.env" });
 
 const app = express();
 
-const PORT = process.env.PORT || 5000;
+// Dev logging middleware
+app.use(morgan("dev"));
 
-const bootCamps = require("./routes/bootcamp");
-
-app.use("/api/v1/bootCamps", bootCamps);
+// Mount routers
+app.use("/api/v1/bootCamps", bootCampsRoutes);
 
 app.listen(PORT, console.log(`Server is running on port ${PORT}`));
