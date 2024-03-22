@@ -1,3 +1,5 @@
+const BootCamp = require("../models/BootCamp");
+
 /**
  *
  * @desc Get all BootCamps
@@ -5,11 +7,17 @@
  */
 const getBootCampList = async (req, res) => {
   try {
-    res.status(200).send({ success: true, message: "Show all BootCamps " });
+    const bootCamps = await BootCamp.find();
+    res.status(200).send({
+      success: true,
+      message: "Data received successfully",
+      totalCount: bootCamps.length,
+      data: bootCamps,
+    });
   } catch (err) {
     res
-      .status(500)
-      .send({ success: false, message: "An error occurred!", error: error });
+      .status(400)
+      .send({ success: false, message: "An error occurred!", error: err });
   }
 };
 
@@ -20,13 +28,18 @@ const getBootCampList = async (req, res) => {
  */
 const getBootCampListById = async (req, res) => {
   try {
-    res
-      .status(200)
-      .send({ success: true, message: `Get BootCamp ${req.params.id}` });
+    const bootCamps = await BootCamp.findById(req.params.id);
+    res.status(200).send({
+      success: true,
+      message: "Data received successfully",
+      data: bootCamps,
+    });
   } catch (err) {
-    res
-      .status(500)
-      .send({ success: false, message: "An error occurred!", error: error });
+    res.status(400).send({
+      success: false,
+      message: "An error occurred!",
+      error: err,
+    });
   }
 };
 
@@ -37,11 +50,16 @@ const getBootCampListById = async (req, res) => {
  */
 const addBootCamp = async (req, res) => {
   try {
-    res.status(200).send({ success: true, message: "Created new BootCamp" });
+    const bootCamp = await BootCamp.create(req.body);
+    res.status(200).send({
+      success: true,
+      message: "Created new BootCamp",
+      data: bootCamp,
+    });
   } catch (err) {
     res
-      .status(500)
-      .send({ success: false, message: "An error occurred!", error: error });
+      .status(400)
+      .send({ success: false, message: "An error occurred!", error: err });
   }
 };
 
@@ -52,13 +70,22 @@ const addBootCamp = async (req, res) => {
  */
 const updateBootCampById = async (req, res) => {
   try {
-    res
-      .status(200)
-      .send({ success: true, message: `Updated BootCamp ${req.params.id}` });
+    const bootCamp = await BootCamp.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).send({
+      success: true,
+      message: `Updated BootCamp ${req.params.id}`,
+      data: bootCamp,
+    });
   } catch (err) {
-    res
-      .status(500)
-      .send({ success: false, message: "An error occurred!", error: error });
+    res.status(400).send({
+      success: false,
+      message: "An error occurred!",
+      error: err,
+    });
   }
 };
 
@@ -69,13 +96,16 @@ const updateBootCampById = async (req, res) => {
  */
 const deleteBootCampById = async (req, res) => {
   try {
-    res
-      .status(200)
-      .send({ success: true, message: `Deleted BootCamp ${req.params.id}` });
+    const bootCamp = await BootCamp.findByIdAndDelete(req.params.id);
+    res.status(200).send({
+      success: true,
+      message: `Deleted BootCamp ${req.params.id}`,
+      data: {},
+    });
   } catch (err) {
     res
-      .status(500)
-      .send({ success: false, message: "An error occurred!", error: error });
+      .status(400)
+      .send({ success: false, message: "An error occurred!", error: err });
   }
 };
 
