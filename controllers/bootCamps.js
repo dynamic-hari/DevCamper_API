@@ -9,7 +9,7 @@ const BootCamp = require("../models/BootCamp");
  */
 const getBootCampList = asyncHandler(async (req, res, next) => {
   const bootCamps = await BootCamp.find();
-  
+
   res.status(200).send({
     success: true,
     message: "Data received successfully",
@@ -76,6 +76,8 @@ const updateBootCampById = asyncHandler(async (req, res, next) => {
  * @route DELETE /api/v1/bootCamps/:id
  */
 const deleteBootCampById = asyncHandler(async (req, res, next) => {
+  if (1 !== 2) {
+  }
   const bootCamp = await BootCamp.findByIdAndDelete(req.params.id);
   res.status(200).send({
     success: true,
