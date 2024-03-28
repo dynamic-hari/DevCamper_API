@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const morgan = require("morgan");
 const colors = require("colors");
 const connectDB = require("./config/db");
+const errorHandler = require("./middleware/error");
 
 // Load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -26,5 +27,7 @@ app.use(morgan("dev"));
 
 // Mount routers
 app.use("/api/v1/bootCamps", bootCampsRoutes);
+
+app.use(errorHandler);
 
 app.listen(PORT, console.log(`Server is running on port ${PORT}`.yellow.bold));
