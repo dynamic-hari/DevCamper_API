@@ -8,7 +8,52 @@ const BootCamp = require("../models/BootCamp");
  * @route GET /api/v1/bootCamps/
  */
 const getBootCampList = asyncHandler(async (req, res, next) => {
-  const bootCamps = await BootCamp.find();
+  let query;
+
+  // Copy req.query
+  const reqQuery = { ...req.query };
+
+  // Fields to exclude
+  const removeFields = ["select", "sort"];
+
+  // Loop over remove fields and remove from Query
+  removeFields.forEach((param) => delete reqQuery[param]);
+
+  // Create Query String
+  let queryString = JSON.stringify(reqQuery);
+
+  // Create operators
+  queryString = queryString.replace(
+    /\b(gt|gte|lt|lte|in)\b/g,
+    (match) => `$${match}`
+  );
+
+  // Finding resources
+  query = BootCamp.find(JSON.parse(queryString));
+
+  // Select fields
+  if (req.query.select) {
+    const fields = req.query.select.split(",").join(" ");
+    query = query.select(fields);
+  }
+
+  //  Sorting
+  if (req.query.sort) {
+    const reqField = req.query.sort.split(",").join(" ");
+    query = query.sort(reqField);
+  } else {
+    query = query.sort("-createdAt");
+  }
+
+  // Pagination
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 5;
+  const skip = (page - 1) * limit;
+
+  query = query.skip(skip).limit(limit);
+
+  // Executing query
+  const bootCamps = await query;
 
   res.status(200).send({
     success: true,
