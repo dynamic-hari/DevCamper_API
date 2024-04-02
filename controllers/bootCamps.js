@@ -14,7 +14,7 @@ const getBootCampList = asyncHandler(async (req, res, next) => {
   const reqQuery = { ...req.query };
 
   // Fields to exclude
-  const removeFields = ["select", "sort"];
+  const removeFields = ["select", "sort", "page", "limit"];
 
   // Loop over remove fields and remove from Query
   removeFields.forEach((param) => delete reqQuery[param]);
