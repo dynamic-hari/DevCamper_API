@@ -9,6 +9,12 @@ const {
   deleteBootCampById,
 } = require("../controllers/bootCamps");
 
+// Include other resource routers
+const courseRouter = require("./courses");
+
+// Re-route into other resource routers
+router.use("/:bootCampId/courses", courseRouter);
+
 // Traditional Way of calling
 // router.get("/", getBootCampList);
 // router.get("/:id", getBootCampListById);

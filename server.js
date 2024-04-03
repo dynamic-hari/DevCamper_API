@@ -16,6 +16,7 @@ const PORT = process.env.PORT || 5000;
 
 // Route Files
 const bootCampsRoutes = require("./routes/bootCamps");
+const coursesRoutes = require("./routes/courses");
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(morgan("dev"));
 
 // Mount routers
 app.use("/api/v1/bootCamps", bootCampsRoutes);
+app.use("/api/v1/courses", coursesRoutes);
 
 app.use(errorHandler);
 

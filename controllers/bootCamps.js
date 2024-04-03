@@ -83,6 +83,7 @@ const getBootCampListById = asyncHandler(async (req, res, next) => {
     data: bootCamp,
   });
 });
+
 /**
  *
  * @desc Add BootCamp
@@ -96,6 +97,7 @@ const addBootCamp = asyncHandler(async (req, res, next) => {
     data: bootCamp,
   });
 });
+
 
 /**
  *
