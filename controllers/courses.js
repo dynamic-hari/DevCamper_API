@@ -69,7 +69,7 @@ const addCourse = asyncHandler(async (req, res, next) => {
   if (!bootCamp) {
     return next(
       new ErrorResponse(
-        `The user with ID ${req.user.id} has already published a bootcamp`,
+        `No BootCamp with the id of ${req.params.bootCampId}`,
         400
       )
     );
@@ -84,4 +84,57 @@ const addCourse = asyncHandler(async (req, res, next) => {
   });
 });
 
-module.exports = { getCourses, getCourseById, addCourse };
+/**
+ *
+ * @desc Update Course by ID
+ * @route PUT /api/v1/courses/:id
+ */
+const updateCourseById = asyncHandler(async (req, res, next) => {
+  let course = await Course.findById(req.params.id);
+
+  if (!course) {
+    return new ErrorResponse(`No Course with the id of ${req.params.id}`, 404);
+  }
+
+  course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).send({
+    success: true,
+    message: `Updated Course ${req.params.id}`,
+    data: course,
+  });
+});
+
+/**
+ *
+ * @desc Delete Course by ID
+ * @route DELETE /api/v1/courses/:id
+ */
+const deleteCourseById = asyncHandler(async (req, res, next) => {
+  const course = await Course.findById(req.params.id);
+
+  if (!course) {
+    return next(
+      new ErrorResponse(`Course not found with the id of ${req.params.id}`, 404)
+    );
+  }
+
+  await course.deleteOne();
+
+  res.status(200).send({
+    success: true,
+    message: `Deleted Course ${req.params.id}`,
+    data: {},
+  });
+});
+
+module.exports = {
+  getCourses,
+  getCourseById,
+  addCourse,
+  updateCourseById,
+  deleteCourseById,
+};
