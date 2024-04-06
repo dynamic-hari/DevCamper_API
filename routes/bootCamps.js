@@ -7,6 +7,7 @@ const {
   getBootCampListById,
   updateBootCampById,
   deleteBootCampById,
+  uploadBootCampPhoto,
 } = require("../controllers/bootCamps");
 
 // Include other resource routers
@@ -25,6 +26,8 @@ router.use("/:bootCampId/courses", courseRouter);
 // Cleaner way of calling
 
 router.route("/").get(getBootCampList).post(addBootCamp);
+
+router.route("/:id/photo").put(uploadBootCampPhoto);
 
 router
   .route("/:id")
