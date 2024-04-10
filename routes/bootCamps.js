@@ -16,13 +16,6 @@ const courseRouter = require("./courses");
 // Re-route into other resource routers
 router.use("/:bootCampId/courses", courseRouter);
 
-// Traditional Way of calling
-// router.get("/", getBootCampList);
-// router.get("/:id", getBootCampListById);
-// router.post("/", addBootCamp);
-// router.put("/:id", updateBootCampById);
-// router.delete("/:id", deleteBootCampById);
-
 // Cleaner way of calling
 
 router.route("/").get(getBootCampList).post(addBootCamp);
