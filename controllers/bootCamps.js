@@ -1,3 +1,4 @@
+const path = require("path");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const BootCamp = require("../models/BootCamp");
@@ -14,7 +15,7 @@ const getBootCampList = asyncHandler(async (req, res, next) => {
   const reqQuery = { ...req.query };
 
   // Fields to exclude
-  const removeFields = ["select", "sort"];
+  const removeFields = ["select", "sort", "page", "limit"];
 
   // Loop over remove fields and remove from Query
   removeFields.forEach((param) => delete reqQuery[param]);
@@ -29,7 +30,7 @@ const getBootCampList = asyncHandler(async (req, res, next) => {
   );
 
   // Finding resources
-  query = BootCamp.find(JSON.parse(queryString));
+  query = BootCamp.find(JSON.parse(queryString)).populate("courses");
 
   // Select fields
   if (req.query.select) {
@@ -83,6 +84,7 @@ const getBootCampListById = asyncHandler(async (req, res, next) => {
     data: bootCamp,
   });
 });
+
 /**
  *
  * @desc Add BootCamp
@@ -121,11 +123,82 @@ const updateBootCampById = asyncHandler(async (req, res, next) => {
  * @route DELETE /api/v1/bootCamps/:id
  */
 const deleteBootCampById = asyncHandler(async (req, res, next) => {
-  await BootCamp.findByIdAndDelete(req.params.id);
+  const bootCamp = await BootCamp.findById(req.params.id);
+
+  if (!bootCamp) {
+    return next(
+      new ErrorResponse(
+        `BootCamp not found with the id of ${req.params.id}`,
+        404
+      )
+    );
+  }
+
+  await bootCamp.deleteOne();
+
   res.status(200).send({
     success: true,
     message: `Deleted BootCamp ${req.params.id}`,
     data: {},
+  });
+});
+
+/**
+ *
+ * @desc Upload photo for bootCamp
+ * @route  PUT /api/v1/bootCamps/:id/photo
+ */
+const uploadBootCampPhoto = asyncHandler(async (req, res, next) => {
+  const bootCamp = await BootCamp.findById(req.params.id);
+  console.log("🚀 ~ uploadBootCampPhoto ~ bootCamp:", bootCamp);
+
+  if (!bootCamp) {
+    return next(
+      new ErrorResponse(
+        `BootCamp not found with the id of ${req.params.id}`,
+        404
+      )
+    );
+  }
+
+  if (!req.files) {
+    return next(new ErrorResponse(`Please upload a file`, 400));
+  }
+  console.log("🚀 ~ uploadBootCampPhoto ~ req.files:", req.files);
+
+  const file = req.files.file;
+  console.log("🚀 ~ uploadBootCampPhoto ~ file:", file);
+
+  // Make sure the image is a photo
+  if (!file.mimetype.startsWith("image")) {
+    return next(new ErrorResponse(`Please upload an image file`, 400));
+  }
+
+  // Check file size
+  if (file.size > process.env.MAX_FILE_UPLOAD) {
+    return next(
+      new ErrorResponse(
+        `Please upload an image less than ${process.env.MAX_FILE_UPLOAD}`,
+        400
+      )
+    );
+  }
+
+  // Create custom filename
+  file.name = `photo_${bootCamp._id}${path.parse(file.name).ext}`;
+
+  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+    if (err) {
+      console.error(err);
+      return next(new ErrorResponse(`Problem with file upload`, 500));
+    }
+
+    await BootCamp.findByIdAndUpdate(req.params.id, { photo: file.name });
+
+    res.status(200).json({
+      success: true,
+      data: file.name,
+    });
   });
 });
 
@@ -135,4 +208,5 @@ module.exports = {
   addBootCamp,
   updateBootCampById,
   deleteBootCampById,
+  uploadBootCampPhoto,
 };
